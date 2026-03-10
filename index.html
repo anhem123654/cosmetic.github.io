@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VERDÉ — Mỹ Phẩm Thiên Nhiên</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --forest:    #1a3a2a;
+      --moss:      #2d5a3d;
+      --leaf:      #4a8c5c;
+      --sage:      #7ab893;
+      --mint:      #b2d8c0;
+      --cream:     #f5f0e8;
+      --parchment: #ede6d6;
+      --gold:      #c9a96e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--cream);
+      color: var(--forest);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed; top: 0; left: 0;
+      width: 10px; height: 10px;
+      background: var(--leaf);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+      mix-blend-mode: multiply;
+    }
+    .cursor-ring {
+      position: fixed; top: 0; left: 0;
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--leaf);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.35s ease, opacity 0.3s ease;
+      opacity: 0.5;
+    }
+
+    /* ─── NAV ─────────────────────────────── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 60px;
+      background: rgba(245,240,232,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(74,140,92,0.15);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px; font-weight: 300; letter-spacing: 6px;
+      color: var(--forest);
+    }
+    .nav-logo span { color: var(--leaf); }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: var(--forest);
+      font-size: 11px; font-weight: 300; letter-spacing: 3px;
+      text-transform: uppercase;
+      position: relative;
+      transition: color 0.3s;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0;
+      width: 0; height: 1px; background: var(--leaf);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--leaf); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      font-size: 11px; font-weight: 300; letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      border: 1px solid var(--leaf);
+      color: var(--leaf);
+      background: transparent;
+      cursor: none;
+      transition: background 0.3s, color 0.3s;
+    }
+    .nav-cta:hover { background: var(--leaf); color: var(--cream); }
+
+    /* ─── HERO ────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-decor {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 60% at 70% 50%, rgba(74,140,92,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 50% at 10% 80%, rgba(45,90,61,0.06) 0%, transparent 60%);
+    }
+
+    /* Leaf SVG shapes */
+    .leaf-decor {
+      position: absolute;
+      opacity: 0.07;
+      pointer-events: none;
+    }
+    .leaf-decor.l1 { top: -60px; right: 200px; width: 280px; transform: rotate(20deg); }
+    .leaf-decor.l2 { bottom: 80px; left: -40px; width: 220px; transform: rotate(-30deg); }
+    .leaf-decor.l3 { top: 30%; right: -30px; width: 160px; transform: rotate(60deg); opacity: 0.05; }
+
+    .hero-text {
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: 80px 60px 80px 80px;
+      position: relative; z-index: 2;
+    }
+    .hero-tag {
+      font-size: 10px; letter-spacing: 5px;
+      text-transform: uppercase; color: var(--leaf);
+      font-weight: 400;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 32px;
+      opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+    }
+    .hero-tag::before {
+      content: ''; display: inline-block;
+      width: 40px; height: 1px; background: var(--leaf);
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(52px, 6vw, 84px);
+      font-weight: 300; line-height: 1.08;
+      color: var(--forest);
+      opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+    }
+    .hero-title em { font-style: italic; color: var(--leaf); }
+    .hero-title .line { display: block; }
+
+    .hero-sub {
+      margin-top: 28px;
+      font-size: 14px; font-weight: 200; letter-spacing: 1px;
+      line-height: 1.9; color: var(--moss);
+      max-width: 380px;
+      opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+    }
+    .hero-actions {
+      margin-top: 48px; display: flex; gap: 20px; align-items: center;
+      opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+    }
+    .btn-primary {
+      padding: 16px 40px;
+      background: var(--forest);
+      color: var(--cream);
+      font-family: 'Jost', sans-serif;
+      font-size: 11px; letter-spacing: 3px;
+      text-transform: uppercase; font-weight: 300;
+      border: none; cursor: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--leaf); transform: translateY(-2px); }
+    .btn-ghost {
+      font-size: 11px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--moss);
+      background: none; border: none; cursor: none;
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Jost', sans-serif; font-weight: 300;
+      transition: color 0.3s;
+    }
+    .btn-ghost::after {
+      content: '→'; transition: transform 0.3s;
+    }
+    .btn-ghost:hover { color: var(--leaf); }
+    .btn-ghost:hover::after { transform: translateX(4px); }
+
+    .hero-stats {
+      margin-top: 64px; display: flex; gap: 48px;
+      opacity: 0; animation: fadeUp 0.8s 1s forwards;
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px; font-weight: 300; color: var(--forest);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 10px; letter-spacing: 2px; color: var(--sage);
+      text-transform: uppercase; margin-top: 6px;
+    }
+
+    /* Hero visual side */
+    .hero-visual {
+      position: relative; display: flex;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+      opacity: 0; animation: fadeIn 1.2s 0.5s forwards;
+    }
+    .hero-visual-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--mint) 0%, var(--sage) 40%, var(--moss) 100%);
+      clip-path: polygon(8% 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+
+    /* Abstract product illustration */
+    .product-circle {
+      position: relative; z-index: 2;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: rgba(245,240,232,0.15);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 30px 80px rgba(26,58,42,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .product-inner {
+      width: 200px; height: 200px; border-radius: 50%;
+      background: linear-gradient(145deg, rgba(245,240,232,0.25), rgba(255,255,255,0.1));
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .product-icon {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 72px; color: rgba(245,240,232,0.8);
+      font-weight: 300; user-select: none;
+    }
+
+    .floating-badge {
+      position: absolute; z-index: 3;
+      background: var(--cream);
+      padding: 16px 20px;
+      box-shadow: 0 8px 32px rgba(26,58,42,0.15);
+    }
+    .floating-badge.b1 { top: 30%; left: 5%; }
+    .floating-badge.b2 { bottom: 25%; right: 8%; }
+    .badge-label {
+      font-size: 9px; letter-spacing: 3px; color: var(--sage);
+      text-transform: uppercase;
+    }
+    .badge-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300; color: var(--forest);
+      margin-top: 2px;
+    }
+
+    /* ─── MARQUEE ─────────────────────────── */
+    .marquee-wrap {
+      background: var(--forest);
+      overflow: hidden;
+      padding: 18px 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .marquee-track {
+      display: flex; gap: 0;
+      animation: marquee 20s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-item {
+      font-size: 11px; letter-spacing: 4px;
+      text-transform: uppercase; color: rgba(178,216,192,0.7);
+      font-weight: 200;
+      padding: 0 40px;
+      display: flex; align-items: center; gap: 40px;
+    }
+    .marquee-item::after { content: '✦'; color: var(--gold); font-size: 8px; }
+
+    /* ─── FEATURES ────────────────────────── */
+    .features {
+      padding: 120px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: rgba(74,140,92,0.1);
+      position: relative;
+    }
+    .feature-card {
+      background: var(--cream);
+      padding: 60px 48px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s;
+    }
+    .feature-card:hover { background: var(--parchment); }
+    .feature-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 64px; font-weight: 300;
+      color: rgba(74,140,92,0.12);
+      position: absolute; top: 20px; right: 28px;
+      line-height: 1;
+    }
+    .feature-icon {
+      font-size: 28px; margin-bottom: 24px;
+    }
+    .feature-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px; font-weight: 300; color: var(--forest);
+      margin-bottom: 16px; line-height: 1.3;
+    }
+    .feature-desc {
+      font-size: 13px; font-weight: 200; line-height: 1.8;
+      color: var(--moss); letter-spacing: 0.3px;
+    }
+    .feature-line {
+      width: 40px; height: 1px; background: var(--leaf);
+      margin-bottom: 20px;
+      transition: width 0.4s;
+    }
+    .feature-card:hover .feature-line { width: 70px; }
+
+    /* ─── PRODUCTS ────────────────────────── */
+    .products {
+      padding: 120px 80px;
+      background: var(--forest);
+    }
+    .section-header {
+      display: flex; align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 72px;
+    }
+    .section-tag {
+      font-size: 10px; letter-spacing: 5px;
+      text-transform: uppercase; color: var(--sage);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section-tag::before {
+      content: ''; width: 30px; height: 1px; background: var(--sage);
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 300; line-height: 1.15;
+      color: var(--cream);
+    }
+    .section-title em { font-style: italic; color: var(--mint); }
+    .view-all {
+      font-size: 11px; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--sage);
+      background: none; border: 1px solid rgba(122,184,147,0.3);
+      padding: 12px 28px; cursor: none;
+      font-family: 'Jost', sans-serif; font-weight: 300;
+      transition: all 0.3s;
+    }
+    .view-all:hover {
+      background: rgba(122,184,147,0.1);
+      border-color: var(--sage);
+      color: var(--mint);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .product-card {
+      position: relative; overflow: hidden;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(122,184,147,0.12);
+      transition: border-color 0.4s, transform 0.4s;
+      cursor: none;
+    }
+    .product-card:hover {
+      border-color: rgba(122,184,147,0.4);
+      transform: translateY(-6px);
+    }
+    .product-img {
+      aspect-ratio: 3/4;
+      background: linear-gradient(160deg, var(--moss), var(--forest));
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .product-img-1 { background: linear-gradient(160deg, #2d5a3d, #4a8c5c, #1a3a2a); }
+    .product-img-2 { background: linear-gradient(160deg, #3d6b4a, #1a3a2a, #4a8c5c); }
+    .product-img-3 { background: linear-gradient(160deg, #1e4430, #5a9e6e, #2a4f38); }
+
+    .product-img-icon {
+      font-size: 56px; opacity: 0.3;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--mint);
+    }
+    .product-tag-badge {
+      position: absolute; top: 16px; left: 16px;
+      background: var(--gold);
+      color: var(--forest);
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 5px 12px; font-weight: 400;
+    }
+    .product-overlay {
+      position: absolute; inset: 0;
+      background: rgba(26,58,42,0.6);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+    .product-card:hover .product-overlay { opacity: 1; }
+    .product-overlay-btn {
+      padding: 12px 28px;
+      background: var(--cream); color: var(--forest);
+      font-size: 10px; letter-spacing: 3px;
+      text-transform: uppercase; border: none; cursor: none;
+      font-family: 'Jost', sans-serif; font-weight: 400;
+      transform: translateY(8px);
+      transition: transform 0.3s 0.05s;
+    }
+    .product-card:hover .product-overlay-btn { transform: translateY(0); }
+
+    .product-info { padding: 24px 28px; }
+    .product-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300; color: var(--cream);
+      margin-bottom: 6px;
+    }
+    .product-sub {
+      font-size: 11px; color: var(--sage); letter-spacing: 1px;
+      font-weight: 200; margin-bottom: 16px;
+    }
+    .product-price {
+      font-size: 18px; color: var(--gold);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+    }
+
+    /* ─── ABOUT STRIP ─────────────────────── */
+    .about-strip {
+      padding: 120px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 100px;
+      align-items: center;
+    }
+    .about-img-col {
+      position: relative;
+    }
+    .about-img-main {
+      width: 100%; aspect-ratio: 4/5;
+      background: linear-gradient(135deg, var(--mint) 0%, var(--leaf) 50%, var(--moss) 100%);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .about-img-icon { font-size: 100px; opacity: 0.15; }
+    .about-img-inset {
+      position: absolute; bottom: -32px; right: -32px;
+      width: 160px; height: 160px;
+      background: var(--parchment);
+      border: 8px solid var(--cream);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .about-img-inset .num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 44px; color: var(--forest); font-weight: 300; line-height: 1;
+    }
+    .about-img-inset .lbl {
+      font-size: 9px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--sage);
+      margin-top: 4px;
+    }
+    .about-text-col {}
+    .about-tag {
+      font-size: 10px; letter-spacing: 5px;
+      text-transform: uppercase; color: var(--leaf);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .about-tag::before {
+      content: ''; width: 30px; height: 1px; background: var(--leaf);
+    }
+    .about-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(34px, 3.5vw, 50px);
+      font-weight: 300; line-height: 1.2; color: var(--forest);
+      margin-bottom: 24px;
+    }
+    .about-title em { font-style: italic; color: var(--leaf); }
+    .about-body {
+      font-size: 14px; font-weight: 200; line-height: 1.9;
+      color: var(--moss); margin-bottom: 40px;
+    }
+    .about-list {
+      list-style: none; display: flex; flex-direction: column; gap: 16px;
+    }
+    .about-list li {
+      font-size: 13px; font-weight: 300;
+      color: var(--forest); letter-spacing: 0.5px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .about-list li::before {
+      content: '✦'; color: var(--gold); font-size: 8px; flex-shrink: 0;
+    }
+
+    /* ─── TESTIMONIALS ────────────────────── */
+    .testimonials {
+      background: var(--parchment);
+      padding: 120px 80px;
+    }
+    .testimonials .section-title { color: var(--forest); }
+    .testimonials .section-title em { color: var(--leaf); }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 64px;
+    }
+    .testi-card {
+      background: var(--cream);
+      padding: 44px 40px;
+      border-bottom: 3px solid transparent;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .testi-card:hover { border-color: var(--leaf); transform: translateY(-4px); }
+    .testi-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 52px; color: var(--mint);
+      line-height: 0.5; margin-bottom: 20px;
+      display: block;
+    }
+    .testi-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px; font-weight: 300;
+      font-style: italic; line-height: 1.7;
+      color: var(--forest); margin-bottom: 28px;
+    }
+    .testi-author { font-size: 11px; letter-spacing: 2px; color: var(--sage); text-transform: uppercase; }
+    .testi-stars { color: var(--gold); font-size: 12px; margin-bottom: 8px; letter-spacing: 2px; }
+
+    /* ─── CTA BANNER ──────────────────────── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--forest) 0%, var(--moss) 60%, var(--leaf) 100%);
+      padding: 100px 80px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(178,216,192,0.06) 0%, transparent 70%);
+    }
+    .cta-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 5vw, 70px);
+      font-weight: 300; color: var(--cream);
+      line-height: 1.15; margin-bottom: 20px;
+      position: relative; z-index: 1;
+    }
+    .cta-title em { font-style: italic; color: var(--mint); }
+    .cta-sub {
+      font-size: 14px; color: rgba(178,216,192,0.7);
+      font-weight: 200; letter-spacing: 1px;
+      margin-bottom: 48px; position: relative; z-index: 1;
+    }
+    .cta-form {
+      display: flex; gap: 0;
+      max-width: 460px; margin: 0 auto;
+      position: relative; z-index: 1;
+    }
+    .cta-input {
+      flex: 1;
+      padding: 16px 20px;
+      background: rgba(245,240,232,0.1);
+      border: 1px solid rgba(245,240,232,0.2);
+      color: var(--cream); font-family: 'Jost', sans-serif;
+      font-size: 13px; font-weight: 200; letter-spacing: 1px;
+      outline: none;
+    }
+    .cta-input::placeholder { color: rgba(245,240,232,0.4); }
+    .cta-input:focus { border-color: rgba(178,216,192,0.5); }
+    .cta-submit {
+      padding: 16px 32px;
+      background: var(--gold); color: var(--forest);
+      border: none; cursor: none;
+      font-family: 'Jost', sans-serif;
+      font-size: 11px; letter-spacing: 3px;
+      text-transform: uppercase; font-weight: 400;
+      transition: background 0.3s;
+    }
+    .cta-submit:hover { background: #d4b578; }
+
+    /* ─── FOOTER ──────────────────────────── */
+    footer {
+      background: #0e2018;
+      padding: 80px 80px 40px;
+      color: rgba(178,216,192,0.5);
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    .footer-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 300; letter-spacing: 6px;
+      color: var(--cream); margin-bottom: 16px;
+    }
+    .footer-brand span { color: var(--leaf); }
+    .footer-tagline {
+      font-size: 13px; font-weight: 200;
+      line-height: 1.7; max-width: 260px;
+      color: rgba(178,216,192,0.5);
+    }
+    .footer-col-title {
+      font-size: 10px; letter-spacing: 4px;
+      text-transform: uppercase; color: var(--sage);
+      margin-bottom: 24px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-links a {
+      text-decoration: none; font-size: 13px;
+      font-weight: 200; color: rgba(178,216,192,0.4);
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--mint); }
+    .footer-bottom {
+      border-top: 1px solid rgba(122,184,147,0.1);
+      padding-top: 32px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-copy {
+      font-size: 11px; letter-spacing: 1px; font-weight: 200;
+    }
+    .footer-socials { display: flex; gap: 24px; }
+    .footer-socials a {
+      font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(178,216,192,0.4); text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-socials a:hover { color: var(--mint); }
+
+    /* ─── ANIMATIONS ──────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-12px); }
+    }
+    .product-circle { animation: floatSlow 5s ease-in-out infinite; }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ─── RESPONSIVE ──────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 20px 30px; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-text { padding: 100px 30px 60px; }
+      .hero-visual { display: none; }
+      .features { grid-template-columns: 1fr; padding: 60px 30px; }
+      .products { padding: 60px 30px; }
+      .products-grid { grid-template-columns: 1fr; }
+      .about-strip { grid-template-columns: 1fr; padding: 60px 30px; gap: 60px; }
+      .testimonials { padding: 60px 30px; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .cta-banner { padding: 60px 30px; }
+      footer { padding: 60px 30px 30px; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">VERD<span>É</span></div>
+    <ul class="nav-links">
+      <li><a href="#">Sản phẩm</a></li>
+      <li><a href="#">Thành phần</a></li>
+      <li><a href="#">Về chúng tôi</a></li>
+      <li><a href="#">Blog</a></li>
+    </ul>
+    <button class="nav-cta">Mua ngay</button>
+  </nav>
+
+  <!-- LEAF DECORATIONS -->
+  <svg class="leaf-decor l1" viewBox="0 0 200 300" fill="var(--forest)">
+    <path d="M100 0 C150 50 180 130 100 300 C20 130 50 50 100 0Z"/>
+  </svg>
+  <svg class="leaf-decor l2" viewBox="0 0 200 300" fill="var(--forest)">
+    <path d="M100 0 C150 50 180 130 100 300 C20 130 50 50 100 0Z"/>
+  </svg>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-decor"></div>
+    <div class="hero-text">
+      <div class="hero-tag">Thuần tự nhiên · Bền vững</div>
+      <h1 class="hero-title">
+        <span class="line">Vẻ đẹp từ</span>
+        <span class="line"><em>lòng đất</em></span>
+        <span class="line">mẹ thiên nhiên</span>
+      </h1>
+      <p class="hero-sub">
+        Mỹ phẩm được chắt lọc từ tinh hoa của thiên nhiên — không hóa chất,
+        không thử nghiệm động vật, chỉ thuần khiết và hiệu quả.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary">Khám phá ngay</button>
+        <button class="btn-ghost">Tìm hiểu thêm</button>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Thành phần tự nhiên</div>
+        </div>
+        <div>
+          <div class="stat-num">0</div>
+          <div class="stat-label">Hóa chất độc hại</div>
+        </div>
+        <div>
+          <div class="stat-num">50k+</div>
+          <div class="stat-label">Khách hàng tin dùng</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-visual-bg"></div>
+      <div class="floating-badge b1">
+        <div class="badge-label">Chứng nhận</div>
+        <div class="badge-val">Organic</div>
+      </div>
+      <div class="product-circle">
+        <div class="product-inner">
+          <div class="product-icon">🌿</div>
+        </div>
+      </div>
+      <div class="floating-badge b2">
+        <div class="badge-label">Vegan</div>
+        <div class="badge-val">Cruelty-Free</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <div class="marquee-item">Chiết xuất thực vật</div>
+      <div class="marquee-item">Không paraben</div>
+      <div class="marquee-item">Đóng gói tái chế</div>
+      <div class="marquee-item">Không silicon</div>
+      <div class="marquee-item">Tinh dầu nguyên chất</div>
+      <div class="marquee-item">Không hương liệu nhân tạo</div>
+      <div class="marquee-item">Thân thiện môi trường</div>
+      <div class="marquee-item">Chiết xuất thực vật</div>
+      <div class="marquee-item">Không paraben</div>
+      <div class="marquee-item">Đóng gói tái chế</div>
+      <div class="marquee-item">Không silicon</div>
+      <div class="marquee-item">Tinh dầu nguyên chất</div>
+      <div class="marquee-item">Không hương liệu nhân tạo</div>
+      <div class="marquee-item">Thân thiện môi trường</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="feature-card reveal">
+      <div class="feature-num">01</div>
+      <div class="feature-icon">🌱</div>
+      <div class="feature-line"></div>
+      <h3 class="feature-title">Nguồn gốc<br>thuần tự nhiên</h3>
+      <p class="feature-desc">Mỗi thành phần được tuyển chọn từ các vùng nguyên liệu sạch, đạt chuẩn hữu cơ quốc tế. Không chất bảo quản tổng hợp.</p>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.15s">
+      <div class="feature-num">02</div>
+      <div class="feature-icon">✨</div>
+      <div class="feature-line"></div>
+      <h3 class="feature-title">Công nghệ<br>xanh tiên tiến</h3>
+      <p class="feature-desc">Quy trình chiết xuất lạnh giữ trọn dưỡng chất. Công thức độc quyền kết hợp khoa học hiện đại với tri thức thảo dược cổ truyền.</p>
+    </div>
+    <div class="feature-card reveal" style="transition-delay:0.3s">
+      <div class="feature-num">03</div>
+      <div class="feature-icon">🌍</div>
+      <div class="feature-line"></div>
+      <h3 class="feature-title">Cam kết<br>bền vững</h3>
+      <p class="feature-desc">100% bao bì tái chế, trung hòa carbon trong sản xuất. Mỗi sản phẩm bán ra, chúng tôi trồng một cây xanh.</p>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="products">
+    <div class="section-header reveal">
+      <div>
+        <div class="section-tag">Bộ sưu tập mới</div>
+        <h2 class="section-title">Tinh hoa<br><em>thiên nhiên</em></h2>
+      </div>
+      <button class="view-all">Xem tất cả</button>
+    </div>
+    <div class="products-grid">
+      <div class="product-card reveal">
+        <div class="product-img product-img-1">
+          <div class="product-img-icon">🌿</div>
+          <div class="product-tag-badge">Bán chạy</div>
+          <div class="product-overlay">
+            <button class="product-overlay-btn">Thêm vào giỏ</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Serum Xanh Lá</div>
+          <div class="product-sub">Tinh chất phục hồi · 30ml</div>
+          <div class="product-price">485.000 ₫</div>
+        </div>
+      </div>
+      <div class="product-card reveal" style="transition-delay:0.1s">
+        <div class="product-img product-img-2">
+          <div class="product-img-icon">🫧</div>
+          <div class="product-overlay">
+            <button class="product-overlay-btn">Thêm vào giỏ</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Kem Dưỡng Forest</div>
+          <div class="product-sub">Dưỡng ẩm chuyên sâu · 50ml</div>
+          <div class="product-price">620.000 ₫</div>
+        </div>
+      </div>
+      <div class="product-card reveal" style="transition-delay:0.2s">
+        <div class="product-img product-img-3">
+          <div class="product-img-icon">🍃</div>
+          <div class="product-tag-badge">Mới</div>
+          <div class="product-overlay">
+            <button class="product-overlay-btn">Thêm vào giỏ</button>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Mặt Nạ Moss</div>
+          <div class="product-sub">Detox & làm sáng · 75ml</div>
+          <div class="product-price">350.000 ₫</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-strip">
+    <div class="about-img-col reveal">
+      <div class="about-img-main">
+        <div class="about-img-icon">🌲</div>
+      </div>
+      <div class="about-img-inset">
+        <div class="num">8+</div>
+        <div class="lbl">Năm nghiên cứu</div>
+      </div>
+    </div>
+    <div class="about-text-col reveal" style="transition-delay:0.2s">
+      <div class="about-tag">Câu chuyện của chúng tôi</div>
+      <h2 class="about-title">Được tạo ra từ<br><em>tình yêu</em> với<br>thiên nhiên</h2>
+      <p class="about-body">
+        VERDÉ ra đời từ niềm tin rằng thiên nhiên có đủ mọi thứ ta cần. 
+        Đội ngũ chuyên gia với hơn 8 năm nghiên cứu đã tìm ra cách khai thác
+        sức mạnh của hệ thực vật nhiệt đới Việt Nam để tạo nên những sản phẩm
+        chăm sóc da hiệu quả và an toàn tuyệt đối.
+      </p>
+      <ul class="about-list">
+        <li>Không chứa paraben, sulfate, silicon hay hương liệu tổng hợp</li>
+        <li>Được kiểm định bởi tổ chức hữu cơ quốc tế COSMOS</li>
+        <li>Được chứng nhận Vegan và Cruelty-Free</li>
+        <li>Bao bì 100% tái chế và có thể phân hủy sinh học</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="reveal" style="text-align:center">
+      <div class="section-tag" style="justify-content:center">Khách hàng nói gì</div>
+      <h2 class="section-title">Được yêu thích bởi<br><em>hàng nghìn</em> người dùng</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <span class="testi-quote">"</span>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Da tôi thay đổi rõ rệt sau 2 tuần dùng Serum Xanh Lá. Căng bóng, đều màu hơn hẳn mà không bị kích ứng gì.</p>
+        <div class="testi-author">— Nguyễn Minh Thư, Hà Nội</div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:0.15s">
+        <span class="testi-quote">"</span>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Mùi hương tự nhiên cực kỳ dễ chịu, texture thấm rất nhanh. Cuối cùng cũng tìm được sản phẩm phù hợp da nhạy cảm của mình.</p>
+        <div class="testi-author">— Trần Bảo Châu, TP.HCM</div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:0.3s">
+        <span class="testi-quote">"</span>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Tôi rất trân trọng cam kết bền vững của VERDÉ. Không chỉ tốt cho da mà còn tốt cho môi trường — đây là điều tôi tìm kiếm.</p>
+        <div class="testi-author">— Lê Hương Giang, Đà Nẵng</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <h2 class="cta-title">Bắt đầu hành trình<br><em>chăm sóc da</em> của bạn</h2>
+    <p class="cta-sub">Đăng ký nhận ưu đãi 15% cho đơn hàng đầu tiên</p>
+    <div class="cta-form">
+      <input class="cta-input" type="email" placeholder="Nhập email của bạn..."/>
+      <button class="cta-submit">Đăng ký</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">VERD<span>É</span></div>
+        <p class="footer-tagline">Mỹ phẩm thuần thiên nhiên — Vẻ đẹp bền vững từ lòng đất mẹ.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Sản phẩm</div>
+        <ul class="footer-links">
+          <li><a href="#">Serum & Tinh chất</a></li>
+          <li><a href="#">Kem dưỡng ẩm</a></li>
+          <li><a href="#">Mặt nạ</a></li>
+          <li><a href="#">Sữa rửa mặt</a></li>
+          <li><a href="#">Chống nắng</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Thông tin</div>
+        <ul class="footer-links">
+          <li><a href="#">Về chúng tôi</a></li>
+          <li><a href="#">Thành phần</a></li>
+          <li><a href="#">Blog làm đẹp</a></li>
+          <li><a href="#">Chứng nhận</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Hỗ trợ</div>
+        <ul class="footer-links">
+          <li><a href="#">Liên hệ</a></li>
+          <li><a href="#">Chính sách đổi trả</a></li>
+          <li><a href="#">Hướng dẫn sử dụng</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 VERDÉ. Tất cả quyền được bảo lưu.</div>
+      <div class="footer-socials">
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">TikTok</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animCursor() {
+      cursor.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+    document.querySelectorAll('button, a').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform += ' scale(1.8)'; ring.style.opacity = '0'; });
+      el.addEventListener('mouseleave', () => { ring.style.opacity = '0.5'; });
+    });
+
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
